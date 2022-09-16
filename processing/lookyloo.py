@@ -98,6 +98,7 @@ class Lookyloo(ProcessingModule):
             for safe_domain in self.safe_domains.split('\n'):
                 if re.match(".*\." + safe_domain.strip().lower() ,o.hostname):
                     self.log("info", "You must not analyze this domain. Did you read the documentation?")
+                    self.results["target"] = "You must not analyze this domain. Did you read the documentation?"
                     return False
 
         myinstance = pylookyloo.Lookyloo(self.instance)
@@ -108,6 +109,7 @@ class Lookyloo(ProcessingModule):
             uuid = myinstance.enqueue(target, listing=False,quiet=True, Depth=10)
         else:
             self.log("error", "Lookyloo backend at '{0}' is unavailable.".format(self.instance))
+            self.results["target"] = "Lookyloo backend at '" + self.instance + "' is unavailable."
             return False
 
         status = 0
@@ -119,6 +121,7 @@ class Lookyloo(ProcessingModule):
 
         if status != 1:
             self.log("error", "Unable to capture '{0}', probably timed out.".format(target))
+            self.results["target"] = "Unable to capture '" + target + "', probably timed out"
             return False
 
         redirects = myinstance.get_redirects(uuid)
