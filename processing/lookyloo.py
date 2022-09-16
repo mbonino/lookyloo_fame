@@ -88,7 +88,7 @@ class Lookyloo(ProcessingModule):
     def each(self, target):
 
         self.results = {"redirections": [], "target": None}
-        
+
         # add http protocol if missing
         # requests lib needs it
         if not target.startswith("http"):
@@ -100,6 +100,7 @@ class Lookyloo(ProcessingModule):
             for safe_domain in self.safe_domains.split('\n'):
                 if re.match(".*\." + safe_domain.strip().lower() ,o.hostname):
                     self.log("info", "You must not analyze this domain. Did you read the documentation?")
+                    self.results["redirections"].append(target)
                     self.results["target"] = "You must not analyze this domain. Did you read the documentation?"
                     return True
 
@@ -109,6 +110,7 @@ class Lookyloo(ProcessingModule):
             uuid = myinstance.enqueue(target, listing=False,quiet=True, Depth=10)
         else:
             self.log("error", "Lookyloo backend at '{0}' is unavailable.".format(self.instance))
+            self.results["redirections"].append(target)
             self.results["target"] = "Lookyloo backend at '" + self.instance + "' is unavailable."
             return True
 
@@ -121,6 +123,7 @@ class Lookyloo(ProcessingModule):
 
         if status != 1:
             self.log("error", "Unable to capture '{0}', probably timed out.".format(target))
+            self.results["redirections"].append(target)
             self.results["target"] = "Unable to capture '" + target + "', probably timed out"
             return True
 
