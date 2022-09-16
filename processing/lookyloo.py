@@ -87,6 +87,8 @@ class Lookyloo(ProcessingModule):
 
     def each(self, target):
 
+        self.results = {"redirections": [], "target": None}
+        
         # add http protocol if missing
         # requests lib needs it
         if not target.startswith("http"):
@@ -102,8 +104,6 @@ class Lookyloo(ProcessingModule):
                     return False
 
         myinstance = pylookyloo.Lookyloo(self.instance)
-
-        self.results = {"redirections": [], "target": None}
 
         if myinstance.is_up:
             uuid = myinstance.enqueue(target, listing=False,quiet=True, Depth=10)
